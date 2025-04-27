@@ -1,5 +1,5 @@
 # Project Documentation: Multi-Region Scalable Web Application Deployment (DevOps)
-1. Project Overview
+# Project Overview
 Brief description of the project:
 
 Deployed a highly available Node.js web application across multiple AWS regions.
@@ -8,7 +8,7 @@ Implemented automatic scaling, load balancing, and CI/CD pipelines.
 
 Ensured fault tolerance, scalability, and high availability.
 
-2. Objectives
+# Objectives
 Deploy a web application across two or more AWS regions.
 
 Set up Elastic Load Balancers and Auto Scaling Groups.
@@ -19,10 +19,10 @@ Monitor infrastructure and application health with CloudWatch.
 
 Achieve fault tolerance through multi-region failover.
 
-3. Architecture Diagram
+# Architecture Diagram
 (Insert your architecture diagram here — you can use the one we already created together.)
 
-4. AWS Services Used
+# AWS Services Used
 Elastic Load Balancer (ELB): Distributes incoming traffic.
 
 Auto Scaling Group (ASG): Automatically adjusts capacity.
