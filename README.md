@@ -47,11 +47,17 @@ CodeDeploy: Automates deployment to EC2 instances.
 
 # Instance Deployment 
 •	Created a Test Instance in each Regions and installed application dependencies on them. i.e Codedeploy Agent, Apache server, cloudwatch agent. 
+
 •	Created an AMI image of the instance for future deployments.
-Used AWS Cloudformation Templates in both regions to:       
+
+Used AWS Cloudformation Templates in both regions to:     
+
 •	Create Auto Scaling Groups and Elastic Load Balancers.
+
 •	Launch EC2 instances hosting a simple web application with launch templates.
+
 •	Attach instances to Target Groups and Load Balancers.
+
 ```YAML
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deploy EC2 behind ALB with Auto Scaling using an AMI
