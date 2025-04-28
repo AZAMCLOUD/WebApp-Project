@@ -52,6 +52,108 @@ Used AWS Cloudformation Templates in both regions to:
 •	Create Auto Scaling Groups and Elastic Load Balancers.
 •	Launch EC2 instances hosting a simple web application with launch templates.
 •	Attach instances to Target Groups and Load Balancers.
+```YAML
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy EC2 behind ALB with Auto Scaling using an AMI
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: Select the VPC
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Select the subnets
+  InstanceRoleArn:
+    Type: String
+    Description: Enter the IAM Role ARN for the EC2 instance
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Select a security group for the resources
+  AmiId:
+    Type: AWS::EC2::Image::Id
+    Description: AMI ID to launch EC2 instance
+
+Resources:
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: WebAppLaunchTemplate
+      LaunchTemplateData:
+        ImageId: !Ref AmiId
+        InstanceType: t2.micro
+        IamInstanceProfile:
+          Arn: !Ref InstanceRoleArn
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: true
+            DeviceIndex: 0
+            Groups:
+              - !Ref SecurityGroupId
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            systemctl start httpd
+            systemctl enable httpd
+            cat <<EOF > /var/www/html/index.html
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Chiazam Iheme - DevOps Engineer</title>
+            </head>
+            <body>
+              <h1>Chiazam Iheme</h1>
+              <p>DevOps Engineer</p>
+            </body>
+            </html>
+            EOF
+
+  AppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: WebAppTargetGroup
+      VpcId: !Ref VpcId
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      HealthCheckPath: /
+
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub WebAppALB-${AWS::StackName}
+      Subnets: !Ref SubnetIds
+      SecurityGroups:
+        - !Ref SecurityGroupId
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '60'
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppTargetGroup
+
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier: !Ref SubnetIds
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      MinSize: '1'
+      MaxSize: '5'
+      DesiredCapacity: '1'
+      TargetGroupARNs:
+        - !Ref AppTargetGroup
+      HealthCheckType: EC2
+      HealthCheckGracePeriod: 300
+```
 
 # Route 53 Configurations 
 •	Created a Hosted Zone
