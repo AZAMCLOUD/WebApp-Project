@@ -48,6 +48,9 @@ CodeDeploy: Automates deployment to EC2 instances.
 # Instance Deployment 
 •	Created a Test Instance in each Regions and installed application dependencies on them. i.e Codedeploy Agent, Apache server, cloudwatch agent. 
 
+![Test Instance with Dependencies Installed](Screenshots/Screenshots(7).png)
+
+
 •	Created an AMI image of the instance for future deployments.
 
 Used AWS Cloudformation Templates in both regions to:     
